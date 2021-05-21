@@ -7,6 +7,7 @@ function startQuiz(){
     let questionBodyElement = document.getElementById("quesitonBody");
     questionBodyElement.innerHTML = questionBody
 }
+
 function showQuestion(i){
     alert("Button pressed");
     let target = document.getElementById("target");
