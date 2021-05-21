@@ -16,4 +16,4 @@ let q3 = ["This is a question (Multiple answer)",
 ]
 
 
-let quizData = [q1, q2, q3]
+var quizData = [q1, q2, q3]
