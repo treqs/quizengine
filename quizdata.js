@@ -18,6 +18,7 @@ let q3 = [
     ["answer 3 is true", true] 
 ]
 
+let meta = {topic:"A Demo Quiz", showPointMetrics:true};
 
-var quizData = [q1, q2, q3]
-var quizTopic = "A Demo Quiz"
+
+var quizData = [meta, q1, q2, q3];

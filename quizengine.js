@@ -1,6 +1,11 @@
-var totalQuestion = quizData.length
+var quizMeta = quizData[0];
+var quizProper = quizData.slice(1);
+totalQuestion = quizProper.length;
 var currentQuestion = 0;
-var possible = runningCount();
+var possible = count();
+var underSelected = 0;
+var overSelected = 0;
+var runningPossible = runningCount();
 var truePositives = 0;
 var falsePositives = 0;
 var falseNegatives = 0;
@@ -9,8 +14,11 @@ var quizStatusMessage = "Default";
 var questionStatusMessage = "Default";
 var performanceStatusMessage = "Default";
 
-//let topicElement = document.getElementById("quizTopic");
-//topicElement.innerHTML = "Topic: " + quizTopic;
+// Set the quiz topic
+document.onload = function () {
+    let topicElement = document.getElementById("quizTopic");
+    topicElement.innerHTML = "Topic: " + quizMeta.topic;
+}
 
 function startQuiz(){
 
@@ -41,8 +49,8 @@ function startQuiz(){
 function runningCount(){
     runningTotals = [];
     let total = 0;
-    for( question of quizData){
-        let answers = question.slice(1);
+    for( question of quizProper){  
+        let answers = question.slice(1);    // skip question text
         for(answer of answers){
             let answerIsCorrect = answer[1];
             if(answerIsCorrect) total++;
@@ -52,13 +60,27 @@ function runningCount(){
     return runningTotals;
 }
 
+function count(){
+    counts = [];
+    for( question of quizProper){  
+        let total = 0;
+        let answers = question.slice(1);    // skip question text
+        for(answer of answers){
+            let answerIsCorrect = answer[1];
+            if(answerIsCorrect) total++;
+        }
+        counts.push(total)
+    }
+    return counts;
+}
+
 function showCurrentQuestion(){
     
     quizStatusMessage = "On question " 
     + String(currentQuestion+1) + " of " 
     + String(totalQuestion);
 
-    let question = quizData[currentQuestion]
+    let question = quizProper[currentQuestion]
     let questionBody = question[0];
     let questionBodyElement = document.getElementById("questionBody");
     questionBodyElement.innerHTML = questionBody
@@ -84,16 +106,13 @@ function showCurrentQuestion(){
         //newChild.innerHTML = "Child " + String(addCount);
         newChild.innerHTML = answerText;
         newChild.style.class = "response";
-//        newChild.style.marginTop = "10px"
-//        newChild.style.marginLeft = "30px";
-//        newChild.style.fontSize = "20px";
+        newChild.style.cursor="pointer";
+        newChild.onclick = e => {answerStatusToggle(e.target)};
 
         // We are going to remember the status of the selection in the elements
         newChild.isSelected = false;
         newChild.answerIsCorrect = answerIsCorrect;
-        newChild.style.cursor="pointer";
-        newChild.onclick = e => {answerStatusToggle(e.target)};
-    
+       
         answersHolder.appendChild(newChild);
         addCount++;
     }
@@ -117,9 +136,12 @@ function answerStatusToggle(elementClicked){
 
 function checkQuestion(){
     let answersHolder = document.getElementById("answersHolder");
+    let expectedResponses = possible[currentQuestion];
+    let actualResponses = 0;
     for(child of answersHolder.children){
         if(child.answerIsCorrect && child.isSelected){
             truePositives += 1;
+            actualResponses += 1;
             child.innerHTML += " (You are correct)"
             child.style.textShadow = "3px 3px 4px green"
         } else if (child.answerIsCorrect && !child.isSelected) {
@@ -127,17 +149,24 @@ function checkQuestion(){
             child.innerHTML += " (This is a correct answer)"
             child.style.textShadow = "0px 0px 0px black"
         } else if (!child.answerIsCorrect && child.isSelected) {
+            actualResponses += 1;
             falsePositives += 1;
             child.innerHTML += " (Oops)"
             child.style.textShadow = "3px 3px 4px red"
         } else {
             trueNegatives += 1
         }
-
     }
 
+    // Determine over/under selections
+    if(actualResponses>expectedResponses){
+        overSelected += (actualResponses - expectedResponses)
+    } else if (actualResponses<expectedResponses){
+        underSelected += (expectedResponses - actualResponses)
+     }
+    
     performanceStatusMessage = "Identified " + String(truePositives) +
-            " correct so far of " + String(possible[currentQuestion]);
+            " correct so far of " + String(runningPossible[currentQuestion]);
     let status = document.getElementById("quizMessages")
 
     status.innerHTML = quizStatusMessage + "; " + performanceStatusMessage;
@@ -149,6 +178,10 @@ function checkQuestion(){
 
     let nextButton = document.getElementById("nextQuestion");
     nextButton.style.display = "block"
+
+    if(currentQuestion+1 == totalQuestion){
+        nextButton.innerHTML = "Get Quiz Stats";
+    }
 }
 
 function nextQuestion(){
@@ -204,11 +237,22 @@ function metrics(){
     if((truePositives +falsePositives)==0) sensitivity = 0;
     sensitivity = toPercent(sensitivity);
 
-    let result = 
-            "<br> Final Quiz Metrics:" +
+    let overUnder = 
+         "<br> Identified " + String(truePositives) +
+            " correct of a possible " + String(runningPossible[runningPossible.length-1]) +
+            "<br> skipped " + underSelected + " response selections " +
+            "<br> made " + overSelected + " extra response selections";
+
+    let pointMetrics = 
+            "<br> Final quiz metrics based on confusion matrix:" +
             "<br>" + truePositives + " " + falsePositives + "<br> "+ falseNegatives + " "+ trueNegatives +
             "<br>" + "Accuracy is " + accuracy + "%"+
             "<br>" + "Precision is " + precision + "%"+
             "<br>" + "Sensitivity is " + sensitivity + "%";
+    let result = overUnder;
+    if(quizMeta.showPointMetrics){
+        result += pointMetrics
+    }
+
     return result;
 }
