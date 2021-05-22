@@ -1,13 +1,22 @@
 <html>
 <head>
   <title>Quiz</title>
+  <link rel="stylesheet" type="text/css" href="quizstyle.css">
   <script src="quizdata.js"></script>
   <script src="quizengine.js"></script>
+  
 </head>
 <body>
-  <h2>Quiz on topic</h2>
-  <p id="question_body">Some text here</p>
-  <div id="target">Target</div>
-  <button onclick="startQuiz()">Start the quiz</button>
+  <h2 id="quizTopic">Quiz on topic</h2>
+  <div>
+    <button id="startQuiz", class="btn", onclick="startQuiz()">Start the quiz</button>
+    <button id="checkQuestion", class="btn hidden", onclick="checkQuestion()">Check answers</button>
+    <button id="nextQuestion", class="btn hidden", onclick="nextQuestion()">Next Question</button>
+  </div>
+  
+  <div class="divHolder", id="quizMessages"></div>
+  <div class="divHolder", id="questionBody"></div>
+  <div class="divHolder", id="answersHolder"></div>
+  
 </body>
 </html>
