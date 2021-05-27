@@ -112,7 +112,7 @@ function showCurrentQuestion(){
         // Set up hover to change the background color of the element
         newChild.onmouseenter = e => {
             e.target.originalcolor = e.target.style.background;
-            e.target.style.background = lightgrey;
+            e.target.style.background = gainsboro;  // Its a light gray
         }
         newChild.onmouseleave = e => {
             e.target.style.background = e.target.originalcolor;
