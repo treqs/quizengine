@@ -165,6 +165,14 @@ function checkQuestion(){
         } else {
             trueNegatives += 1
         }
+
+        // Make the answer elements unresponsive while displaying
+        // the results for a question
+        for(child of answersHolder.children){
+            child.onclick = null;
+            child.onmouseenter = null;
+            child.onmouseleave = null;
+        }
     }
 
     // Determine over/under selections
