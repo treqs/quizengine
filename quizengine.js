@@ -109,6 +109,15 @@ function showCurrentQuestion(){
         newChild.style.cursor="pointer";
         newChild.onclick = e => {answerStatusToggle(e.target)};
 
+        // Set up hover to change the background color of the element
+        newChild.onmouseenter = e => {
+            e.target.originalcolor = e.target.style.background;
+            e.target.style.background = lightgrey;
+        }
+        newChild.onmouseleave = e => {
+            e.target.style.background = e.target.originalcolor;
+        }
+
         // We are going to remember the status of the selection in the elements
         newChild.isSelected = false;
         newChild.answerIsCorrect = answerIsCorrect;
